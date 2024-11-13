@@ -1,0 +1,2 @@
+# Ignore all library stuff from node_modules
+node_modules/
