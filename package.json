@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@react-google-maps/api": "^2.20.3",
+    "@vis.gl/react-google-maps": "^1.4.0",
+    "install": "^0.13.0",
+    "npm": "^10.9.0",
+    "use-places-autocomplete": "^4.0.1"
+  }
+}
