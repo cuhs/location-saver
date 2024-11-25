@@ -1,13 +1,14 @@
 import './App.css';
 import React from 'react'
 import { useState } from 'react'
+import CustomMap from './CustomMap'
 
 function App() {
 
   return (
     <div className="App">
       <header className="App-header">
-        Some change on new branch alex-changes
+        <CustomMap></CustomMap>
       </header>
     </div>
   );
