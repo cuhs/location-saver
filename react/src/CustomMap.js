@@ -4,14 +4,15 @@ import { AdvancedMarker, APIProvider, Map, Marker} from "@vis.gl/react-google-ma
 
 const CustomMap = () => {
   // shows marker on London by default
-  const position = ({lat: 50, lng: 10});
-  const GOOGLE_MAP_API = 'SOME_API_KEY';
+  const position = ({lat: 34.0722, lng: -118.4441});
+  const GOOGLE_MAP_API = 'some_api_key';
   return (
     <div className="map-container">
       <APIProvider apiKey={GOOGLE_MAP_API}>
         <Map
-          defaultZoom={13}
+          defaultZoom={16}
           defaultCenter={position}>
+          <Marker position={position}></Marker>
         </Map>
       </APIProvider>
     </div>
