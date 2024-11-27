@@ -15,33 +15,6 @@ app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 
-route.get('/simple-get', (req, res) => {
-  res.send("here");
-});
-
-route.get('/dynamic-get/:text', (req, res) => {
-  res.send(req.params.text);
-});
-
-route.get('/pokemon/:name', async (req, res) => {
-  const pokemonName = req.params.name.toLowerCase();
-
-  try {
-    const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
-    
-    const pokemonData = {
-      name: response.data.name,
-      id: response.data.id,
-      height: response.data.height,
-      weight: response.data.weight,
-    };
-
-    res.json(pokemonData);
-  } catch (error) {
-    res.status(404).send({ error: "Pokémon not found!" });
-  }
-});
-
 const db = mysql.createConnection({
   host: '127.0.0.1',
   user: 'root',
@@ -58,12 +31,12 @@ db.connect((err) => {
   }
 });
 
-route.post('/add-user', (req, res) => {
-  const { email, password } = req.body;
+route.post('/add-location', (req, res) => {
+  const { name, category, user, lng, lat } = req.body;
 
-  const query = 'INSERT INTO users (user_email, user_password) VALUES (?, ?)';
+  const query = 'INSERT INTO locations (location_name, location_category, user_name, location_longitude, location_lattitude) VALUES (?, ?, ?, ?, ?)';
   
-  db.query(query, [email, password], (err, result) => {
+  db.query(query, [name, category, user, lng, lat], (err, result) => {
     if (err) {
       return res.status(500).send('Error adding user to the database.');
     }
@@ -71,20 +44,20 @@ route.post('/add-user', (req, res) => {
   });
 });
 
-route.post('/verify-user', (req, res) => {
-  const { email, password } = req.body;
+route.post('/get-location', (req, res) => {
+  const { name } = req.body;
 
-  const query = 'SELECT * FROM users WHERE user_email = ? AND user_password = ?';
+  const query = 'SELECT * FROM locations WHERE location_name = ?';
   
-  db.query(query, [email, password], (err, results) => {
+  db.query(query, [name], (err, results) => {
     if (err) {
       return res.status(500).send('Error verifying user credentials.');
     }
 
     if (results.length > 0) {
-      res.status(200).send('User verified successfully.');
+      res.status(200).send(results);
     } else {
-      res.status(401).send('Invalid email or password.');
+      res.status(401).send('Location not found.');
     }
   });
 });
