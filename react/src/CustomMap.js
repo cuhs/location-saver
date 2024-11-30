@@ -7,8 +7,10 @@ const CustomMap = () => {
   const position = { lat: 34.0722, lng: -118.4441 };
   const GOOGLE_MAP_API = 'some-api-key';
   const [placeMarker, setPlaceMarker] = useState(false);
-  const [markers, setMarkers] = useState([position]);
+  const [markers, setMarkers] = useState([]);
 
+
+  
   const togglePlaceMarker = () => {
     setPlaceMarker(!placeMarker);
   };
@@ -23,22 +25,29 @@ const CustomMap = () => {
   const handleGetLocation = async () => {
     try {
       const response = await axios.post("http://localhost:5001/v1/get-location", {
-        category: "UCLA buildings" // Update with the actual location name
+        category: "UCLA buildings" 
       });
       const fetchedMarkers = response.data.map(location => ({
-        lat: location.location_lattitude,
-        lng: location.location_longitude
+        lat: parseFloat(location.location_lattitude),
+        lng: parseFloat(location.location_longitude)
       }));
-      setMarkers(fetchedMarkers);
+      console.log("fetchedMarkers: ", fetchedMarkers)
+      setMarkers(
+        fetchedMarkers
+      );
+      
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+  
 
   useEffect(() => {
     handleGetLocation();
-    console.log(markers)
   }, []);
+  useEffect(() => {
+    console.log("Updated markers: ", markers);
+  }, [markers]);
   return (
     <div className="map-container">
       <button onClick={togglePlaceMarker}>
@@ -49,8 +58,9 @@ const CustomMap = () => {
           defaultZoom={16}
           defaultCenter={position}
           onClick={handleMapClick}>
-          
-          
+          {markers.map((marker, index) => (
+            <Marker key={index} position={marker}></Marker>
+          ))}
         </Map>
       </APIProvider>
     </div>
