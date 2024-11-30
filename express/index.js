@@ -61,3 +61,22 @@ route.post('/get-location', (req, res) => {
     }
   });
 });
+
+route.post('/get-location-by-pos', (req, res) => {
+  const { lng, lat } = req.body;
+
+  const query = 'SELECT * FROM locations WHERE location_longitude = ? AND location_lattitude = ?';
+  
+  db.query(query, [lng, lat], (err, results) => {
+    if (err) {
+      return res.status(500).send('Error getting location.');
+    }
+
+    if (results.length > 0) {
+      res.status(200).json(results); // Ensure the response is in JSON format
+    } else {
+      res.status(401).send('Location not found.');
+    }
+  });
+});
+

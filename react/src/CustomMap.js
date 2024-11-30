@@ -8,7 +8,8 @@ const CustomMap = () => {
   const GOOGLE_MAP_API = 'some-api-key';
   const [placeMarker, setPlaceMarker] = useState(false);
   const [markers, setMarkers] = useState([]);
-
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [activeMarker, setActiveMarker] = useState(null);
 
   
   const togglePlaceMarker = () => {
@@ -52,7 +53,25 @@ const CustomMap = () => {
       console.error("Error fetching data:", error);
     }
   };
+
+  const handleGetLocByPos = async (lng, lat) => {
+    try {
+      const response = await axios.post("http://localhost:5001/v1/get-location-by-pos", {
+        lng: lng,
+        lat: lat
+      });
+      console.log("response: ", response.data[0].location_name)
+      setSelectedLocation(response.data[0]);
+      setActiveMarker({ lng, lat });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
   
+  const handleClosePopup = () => {
+    setSelectedLocation(null);
+    setActiveMarker(null);
+  };
 
   useEffect(() => {
     handleGetLocation();
@@ -62,7 +81,7 @@ const CustomMap = () => {
   }, [markers]);
   return (
     <div className="map-container">
-      <button onClick={togglePlaceMarker}>
+      <button className = "enableButton" onClick={togglePlaceMarker}>
         {placeMarker ? "Disable Marker Placing" : "Enable Marker Placing"}
       </button>
       <APIProvider apiKey={GOOGLE_MAP_API}>
@@ -71,10 +90,26 @@ const CustomMap = () => {
           defaultCenter={position}
           onClick={placeMarker ? handleMapClick : null}>
           {markers.map((marker, index) => (
-            <Marker key={index} position={marker}></Marker>
+            <Marker 
+              key={index} 
+              position={marker}
+              onClick={() => handleGetLocByPos(marker.lng, marker.lat)}
+              icon={activeMarker && activeMarker.lng === marker.lng && activeMarker.lat === marker.lat ? 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png' : 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'}
+            ></Marker>
           ))}
         </Map>
       </APIProvider>
+      {selectedLocation && (
+        <div className="location-info">
+          <button className="close-btn" onClick={handleClosePopup}>X</button>
+          <h2>Location Information</h2>
+          <p>Name: {selectedLocation.location_name}</p>
+          <p>Category: {selectedLocation.location_category}</p>
+          <p>User: {selectedLocation.user_name}</p>
+          <p>Longitude: {selectedLocation.location_longitude}</p>
+          <p>Latitude: {selectedLocation.location_lattitude}</p>
+        </div>
+      )}
     </div>
   );
 }
